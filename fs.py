@@ -9,21 +9,6 @@ aq = AircraftRequests(sm, _time=10)
 
 
             
-##list of variables that need to be converted to INT  
-listofints = ['PLANE_ALTITUDE',
-              'PLANE_ALT_ABOVE_GROUND',
-              'SIM_ON_GROUND',
-              'AIRSPEED_INDICATED',
-              'HEADING_INDICATOR',
-              'BRAKE_PARKING_POSITION',
-              'FUEL_TOTAL_CAPACITY',
-              'TOTAL_WEIGHT',
-              'FUEL_TOTAL_QUANTITY',
-              'AMBIENT_WIND_VELOCITY',
-              "AMBIENT_WIND_DIRECTION", 
-              'AMBIENT_VISIBILITY',
-               "BAROMETER_PRESSURE",
-               "AMBIENT_TEMPERATURE"]
 
 while True:
     results = []
@@ -63,8 +48,6 @@ while True:
         result = aq.get(dp)
         if type(result) == bytes: ## some returns are bites, we convert them to strings
             result = result.decode('UTF-8')
-        if dp in listofints:
-            result = int(result)
         print(dp+': '+str(result))
         results.append(result)
 
