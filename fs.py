@@ -9,7 +9,7 @@ aq = AircraftRequests(sm, _time=10)
 
 
             
-  
+##list of variables that need to be converted to INT  
 listofints = ['PLANE_ALTITUDE',
               'PLANE_ALT_ABOVE_GROUND',
               'SIM_ON_GROUND',
@@ -24,7 +24,6 @@ listofints = ['PLANE_ALTITUDE',
               'AMBIENT_VISIBILITY',
                "BAROMETER_PRESSURE",
                "AMBIENT_TEMPERATURE"]
-
 
 while True:
     results = []
@@ -70,7 +69,7 @@ while True:
         results.append(result)
 
 
-    ## adding non simconnect data
+    ## adding non simconnect data to both lists
 
     #current 
     datapoints.append('COMPUTER_HOUR')
