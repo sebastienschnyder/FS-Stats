@@ -10,6 +10,7 @@ aq = AircraftRequests(sm, _time=10)
 
             
 
+
 while True:
     results = []
     datapoints= ['PLANE_LATITUDE',
@@ -39,38 +40,69 @@ while True:
                   "ATC_MODEL",
                   'ZULU_TIME',
                  ]
-  
+      
 
     ##pulling all datapoints from simconnect
-    for dp in datapoints:
+    
+    if aq.get('BRAKE_PARKING_POSITION') !=1:
+    
+        for dp in datapoints: ## iterating over the provided datapoints
 
 
-        result = aq.get(dp)
-        if type(result) == bytes: ## some returns are bites, we convert them to strings
-            result = result.decode('UTF-8')
-        print(dp+': '+str(result))
-        results.append(result)
+            result = aq.get(dp)
+            
+        
+            
+            if type(result) == bytes: ## some returns are bites, we convert them to strings
+                result = result.decode('UTF-8')
+            
+            else:
+                result = result
+            
+            print(dp+': '+str(result))
+            results.append(result)
+            time.sleep(0.1)
 
 
-    ## adding non simconnect data to both lists
+        ## adding non simconnect data
 
-    #current 
-    datapoints.append('COMPUTER_HOUR')
-    results.append(datetime.now().strftime("%H:%M:%S"))
+        #current 
+        datapoints.append('COMPUTER_HOUR')
+        results.append(datetime.now().strftime("%H:%M:%S"))
 
-    datapoints.append('COMPUTER_DAY')
-    results.append(datetime.now().strftime("%Y-%m-%d"))   
+        datapoints.append('COMPUTER_DAY')
+        results.append(datetime.now().strftime("%Y-%m-%d"))   
 
-    datapoints.append('EPOCH_TIMESTAMP')
-    results.append(datetime.now().timestamp())   
+        datapoints.append('EPOCH_TIMESTAMP')
+        results.append(datetime.now().timestamp())   
 
-    con = sqlite3.connect('test.db')
 
- 
 
-    cur = con.cursor()
-    #cur.execute("CREATE TABLE IF NOT EXISTS fs2020_4( PLANE_LATITUDE real ,PLANE_LONGITUDE real ,PLANE_ALTITUDE real ,PLANE_ALT_ABOVE_GROUND real ,SIM_ON_GROUND real ,AIRSPEED_INDICATED real ,AIRSPEED_MACH real ,VERTICAL_SPEED real ,HEADING_INDICATOR real ,AUTOPILOT_MASTER real ,GPS_WP_NEXT_LAT real ,GPS_WP_NEXT_LON real ,GEAR_TOTAL_PCT_EXTENDED real ,BRAKE_PARKING_POSITION real ,TOTAL_WEIGHT real ,FUEL_TOTAL_QUANTITY real ,FUEL_TOTAL_CAPACITY real ,AMBIENT_WIND_VELOCITY real ,AMBIENT_WIND_DIRECTION real ,AMBIENT_VISIBILITY real ,BAROMETER_PRESSURE real ,AMBIENT_TEMPERATURE real ,GPS_WP_PREV_ID TEXT , GPS_WP_NEXT_ID TEXT , ATC_MODEL TEXT , ZULU_TIME real ,COMPUTER_HOUR TEXT , COMPUTER_DAY TEXT , EPOCH_TIMESTAMP real)")
-    cur.execute('INSERT INTO fs2020_4 VALUES '+str(tuple(results)))
-    con.commit()
+
+        ##creating table creation string
+        table_name = 'fs2020_6'
+
+        sqlstring = 'CREATE TABLE IF NOT EXISTS '+table_name+'('
+        for d in datapoints:
+            if type(results[datapoints.index(d)]) == str:
+
+                sqlstring = sqlstring+d+' TEXT , ' 
+            else:
+                sqlstring = sqlstring+d+' real ,' 
+
+        sqlstring = sqlstring[:-2]+')' ##remove last trailing coma and close the bracket
+
+        ## sql string for inserting
+        sqlinsert = 'INSERT INTO '+table_name+' VALUES '+str(tuple(results))
+
+
+        con = sqlite3.connect('test.db')
+        cur = con.cursor()
+        cur.execute(sqlstring)
+        cur.execute(sqlinsert)
+        con.commit()
+    
+    else:
+        print('parking brake on, no data recorded')
     time.sleep(5)
 
